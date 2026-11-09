@@ -4,7 +4,7 @@ require 'db.php';   // runs db.php, so $pdo now exists here
 
 $client_id = $_GET['client'] ?? 0;
 
-$stmt = $pdo->prepare("SELECT name FROM clients WHERE client_id = ?");
+$stmt = $pdo->prepare("SELECT name FROM clients WHERE id = ?");
 $stmt->execute([$client_id]);
 $client = $stmt->fetch();
 
