@@ -34,6 +34,7 @@ $given    = $_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? '';
 $expected = 'sha256=' . hash_hmac('sha256', $body, $config['wa_app_secret']);
 
 if ($config['wa_app_secret'] === '' || !hash_equals($expected, $given)) {
+    error_log('WhatsApp: bad signature (check WA_APP_SECRET)');
     http_response_code(403);
     exit;
 }
@@ -81,6 +82,12 @@ foreach ($data['entry'] ?? [] as $entry) {
     foreach ($entry['changes'] ?? [] as $change) {
         foreach ($change['value']['messages'] ?? [] as $message) {
             handleIncoming($pdo, $config, $message);
+        }
+        // Meta tells us later if a reply couldn't be delivered. Log why.
+        foreach ($change['value']['statuses'] ?? [] as $status) {
+            if (($status['status'] ?? '') === 'failed') {
+                error_log('WhatsApp: delivery failed: ' . json_encode($status['errors'] ?? []));
+            }
         }
     }
 }

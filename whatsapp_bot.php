@@ -55,6 +55,16 @@ function botTotals(PDO $pdo): string {
 
 function botBookmark(PDO $pdo, array $words): string {
     [$client, $words] = takeClientFromEnd($pdo, $words);
+
+    // "school 2": if the last word is a whole number, that's how many trips.
+    $count = 1;
+    if (count($words) > 1 && ctype_digit(end($words))) {
+        $count = (int) array_pop($words);
+    }
+    if ($count < 1 || $count > 10) {
+        return 'I can log 1 to 10 trips at a time.';
+    }
+
     $name = mb_strtolower(implode(' ', $words));
 
     // "school" matches "School run": find bookmarks whose name STARTS with what was sent.
@@ -83,9 +93,11 @@ function botBookmark(PDO $pdo, array $words): string {
         return "Who's it for? Put a name at the end, like: " . mb_strtolower($bookmark['name']) . ' ' . exampleClientName($pdo);
     }
 
-    saveTrip($pdo, (int) $client['id'], $bookmark['name'], (float) $bookmark['amount'], (int) $bookmark['id']);
+    for ($i = 0; $i < $count; $i++) {
+        saveTrip($pdo, (int) $client['id'], $bookmark['name'], (float) $bookmark['amount'], (int) $bookmark['id']);
+    }
 
-    return "Logged: {$bookmark['name']}, " . money($bookmark['amount']) . " for {$client['name']}.\n"
+    return "Logged: {$count} × {$bookmark['name']}, " . money($bookmark['amount'] * $count) . " for {$client['name']}.\n"
          . owedLine($pdo, (int) $client['id']);
 }
 
@@ -93,15 +105,6 @@ function botAddOneTime(PDO $pdo, array $words): string {
     $example = 'add 250 airport ' . exampleClientName($pdo);
 
     [$client, $words] = takeClientFromEnd($pdo, $words);
-
-        // "school 2": if the last word is a whole number, that's how many trips.
-    $count = 1;
-    if (count($words) > 1 && ctype_digit(end($words))) {
-        $count = (int) array_pop($words);
-    }
-    if ($count < 1 || $count > 10) {
-        return 'I can log 1 to 10 trips at a time.';
-    }
 
     // The first word is the amount. Allow "250", "R250" and "250,50".
     $amountText = str_replace(',', '.', ltrim(array_shift($words) ?? '', 'Rr'));
@@ -120,14 +123,10 @@ function botAddOneTime(PDO $pdo, array $words): string {
         return "Who's it for? Put a name at the end. Try: $example";
     }
 
-        for ($i = 0; $i < $count; $i++) {
-        saveTrip($pdo, (int) $client['id'], $bookmark['name'], (float) $bookmark['amount'], (int) $bookmark['id']);
-    }
+    saveTrip($pdo, (int) $client['id'], $description, $amount, null);
 
-    return "Logged: {$count} × {$bookmark['name']}, " . money($bookmark['amount'] * $count) . " for {$client['name']}.\n"
+    return "Added: $description, " . money($amount) . " for {$client['name']}.\n"
          . owedLine($pdo, (int) $client['id']);
-
-    
 }
 
 function botUndo(PDO $pdo): string {

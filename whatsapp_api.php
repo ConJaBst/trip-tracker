@@ -40,5 +40,8 @@ function waSend(array $config, array $message): bool {
         error_log("WhatsApp send failed ($status): $why");
         return false;
     }
+
+    // For now, also log when it worked. Remove this line once the bot is running smoothly.
+    error_log("WhatsApp: Meta accepted the reply: $answer");
     return true;
 }
