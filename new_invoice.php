@@ -1,6 +1,7 @@
 <?php
 require 'auth.php';  // make sure the user is logged in
 require 'db.php';
+require 'invoic_functions.php';  
 
 // Checks text is a real date in the form 2026-11-09
 function isValidDate(string $text): bool {
@@ -38,63 +39,18 @@ if ($clientId > 0) {
 //   - this person's unbilled trips in the date range, PLUS
 //   - every trip on this person's UNPAID invoices (carried over, whatever the date).
 // The same WHERE is used for the preview and for the real thing, so they always agree.
-$tripFilter = "
-    client_id = :client
-    AND (
-        (invoice_id IS NULL AND trip_date BETWEEN :from AND :to)
-        OR invoice_id IN (SELECT id FROM invoices WHERE client_id = :client2 AND paid_at IS NULL)
-    )
-";
-$filterValues = ['client' => $clientId, 'client2' => $clientId, 'from' => $from, 'to' => $to];
+[$tripFilter, $filterValues] = invoiceTripFilter($clientId, $from, $to);
 
 // --- Create the invoice ---
+// --- Create the invoice ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $client && $error === '') {
-    $pdo->beginTransaction();
-    try {
-        // 1. Remember which unpaid invoices we're replacing.
-        $stmt = $pdo->prepare("SELECT id FROM invoices WHERE client_id = ? AND paid_at IS NULL");
-        $stmt->execute([$clientId]);
-        $oldInvoiceIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    $invoiceId = createInvoice($pdo, $clientId, $from, $to);
 
-        // 2. Make the new invoice (total filled in at step 5).
-        $stmt = $pdo->prepare("
-            INSERT INTO invoices (client_id, period_start, period_end, total)
-            VALUES (?, ?, ?, 0)
-        ");
-        $stmt->execute([$clientId, $from, $to]);
-        $invoiceId = (int) $pdo->lastInsertId();
-
-        // 3. Move the trips onto it: new ones in the range, and everything from unpaid invoices.
-        $stmt = $pdo->prepare("UPDATE trips SET invoice_id = :invoice WHERE $tripFilter");
-        $stmt->execute(['invoice' => $invoiceId] + $filterValues);
-
-        if ($stmt->rowCount() === 0) {
-            $pdo->rollBack();
-            $error = 'There are no trips to bill for that person in those dates.';
-        } else {
-            // 4. The old unpaid invoices are now empty, so delete them.
-            if (count($oldInvoiceIds) > 0) {
-                $placeholders = implode(',', array_fill(0, count($oldInvoiceIds), '?'));
-                $stmt = $pdo->prepare("DELETE FROM invoices WHERE id IN ($placeholders) AND paid_at IS NULL");
-                $stmt->execute($oldInvoiceIds);
-            }
-
-            // 5. Total, and stretch the start date back if carried-over trips are older.
-            $stmt = $pdo->prepare("SELECT SUM(amount) AS total, MIN(trip_date) AS first_trip FROM trips WHERE invoice_id = ?");
-            $stmt->execute([$invoiceId]);
-            $sums = $stmt->fetch();
-            $start = min($from, $sums['first_trip']);   // dates as YYYY-MM-DD compare correctly as text
-
-            $stmt = $pdo->prepare("UPDATE invoices SET total = ?, period_start = ? WHERE id = ?");
-            $stmt->execute([$sums['total'], $start, $invoiceId]);
-
-            $pdo->commit();
-            header("Location: invoice.php?id=$invoiceId");
-            exit;
-        }
-    } catch (Throwable $e) {
-        $pdo->rollBack();
-        throw $e;
+    if ($invoiceId === null) {
+        $error = 'There are no trips to bill for that person in those dates.';
+    } else {
+        header("Location: invoice.php?id=$invoiceId");
+        exit;
     }
 }
 
