@@ -1,0 +1,7 @@
+# Settings for this PC only. Holds the password hash. Never commit this.
+config.local.php
+
+# Editor and Windows clutter
+.vscode/
+Thumbs.db
+desktop.ini
