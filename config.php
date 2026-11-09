@@ -17,7 +17,7 @@ $config = [
     'wa_token'           => getenv('WA_TOKEN') ?: '',            // from Meta: lets us send replies
     'wa_phone_number_id' => getenv('WA_PHONE_NUMBER_ID') ?: '',  // the bot's id at Meta
     'wa_my_number'       => getenv('WA_MY_NUMBER') ?: '',        // your number, like 27821234567
-    'wa_graph_version'   => getenv('WA_GRAPH_VERSION') ?: 'v23.0',
+    'wa_graph_version'   => getenv('WA_GRAPH_VERSION') ?: 'v25.0',
 ];
 
 // If config.local.php exists, its values replace the ones above.
