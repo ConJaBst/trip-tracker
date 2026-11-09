@@ -13,32 +13,46 @@ $invoices = $pdo->query("
 ")->fetchAll();
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Past invoices</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <p><a href="index.php">&larr; Back</a></p>
+<main class="page">
+    <a class="back-link" href="index.php">&larr; Back</a>
     <h1>Past invoices</h1>
 
-    <?php if (count($invoices) === 0): ?>
-        <p>No invoices yet. <a href="new_invoice.php">Create one</a>.</p>
-    <?php else: ?>
-        <table border="1" cellpadding="6">
-            <tr><th>Invoice</th><th>For</th><th>Trips from</th><th>To</th><th>Trips</th><th>Total</th><th>Status</th></tr>
-            <?php foreach ($invoices as $invoice): ?>
-                <tr>
-                    <td><a href="invoice.php?id=<?= $invoice['id'] ?>"><?= sprintf('INV-%04d', $invoice['id']) ?></a></td>
-                    <td><?= htmlspecialchars($invoice['client_name']) ?></td>
-                    <td><?= htmlspecialchars($invoice['period_start']) ?></td>
-                    <td><?= htmlspecialchars($invoice['period_end']) ?></td>
-                    <td><?= $invoice['trip_count'] ?></td>
-                    <td>R<?= number_format($invoice['total'], 2) ?></td>
-                    <td><?= $invoice['paid_at'] === null ? 'Unpaid' : 'Paid' ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
-    <?php endif; ?>
+    <section class="card">
+        <?php if (count($invoices) === 0): ?>
+            <p>No invoices yet. <a href="new_invoice.php">Create one</a>.</p>
+        <?php else: ?>
+            <div class="table-wrap">
+                <table>
+                    <tr><th>Invoice</th><th>For</th><th>Trips from</th><th>To</th><th>Trips</th><th class="amount">Total</th><th>Status</th></tr>
+                    <?php foreach ($invoices as $invoice): ?>
+                        <tr>
+                            <td><a href="invoice.php?id=<?= $invoice['id'] ?>"><?= sprintf('INV-%04d', $invoice['id']) ?></a></td>
+                            <td><?= htmlspecialchars($invoice['client_name']) ?></td>
+                            <td><?= htmlspecialchars($invoice['period_start']) ?></td>
+                            <td><?= htmlspecialchars($invoice['period_end']) ?></td>
+                            <td><?= $invoice['trip_count'] ?></td>
+                            <td class="amount">R<?= number_format($invoice['total'], 2) ?></td>
+                            <td>
+                                <?php if ($invoice['paid_at'] === null): ?>
+                                    <span class="status unpaid">Unpaid</span>
+                                <?php else: ?>
+                                    <span class="status paid">Paid</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </div>
+        <?php endif; ?>
+    </section>
+</main>
 </body>
 </html>

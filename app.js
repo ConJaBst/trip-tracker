@@ -24,13 +24,13 @@ function updateTotals(totals) {
 // If a tripId is given, add an Undo button that deletes that trip.
 function showMessage(text, isError = false, tripId = null) {
     messageBox.textContent = text;
-    messageBox.style.background = isError ? '#ffe6e6' : '#e6ffe6';
+    messageBox.classList.toggle('error', isError);   // red if it's an error (colours live in style.css)
     messageBox.hidden = false;
 
     if (tripId !== null) {
         const undoButton = document.createElement('button');
         undoButton.textContent = 'Undo';
-        undoButton.style.marginLeft = '8px';
+        undoButton.className = 'secondary';
         undoButton.addEventListener('click', () => undoTrip(tripId, undoButton));
         messageBox.append(undoButton);
     }

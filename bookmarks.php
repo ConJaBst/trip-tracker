@@ -31,35 +31,47 @@ $bookmarks = $pdo->query("
 ")->fetchAll();
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bookmarks</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <p><a href="index.php">&larr; Back</a></p>
+<main class="page">
+    <a class="back-link" href="index.php">&larr; Back</a>
     <h1>Bookmarks</h1>
+    <p class="muted">Trips you log often, ready to add with one click.</p>
 
-    <table border="1" cellpadding="6">
-        <tr><th>Name</th><th>Amount</th><th>Usually for</th></tr>
-        <?php foreach ($bookmarks as $bookmark): ?>
-            <tr>
-                <td><?= htmlspecialchars($bookmark['name']) ?></td>
-                <td>R<?= number_format($bookmark['amount'], 2) ?></td>
-                <td><?= htmlspecialchars($bookmark['default_client'] ?? 'Ask each time') ?></td>
-            </tr>
-        <?php endforeach; ?>
-    </table>
+    <section class="card">
+        <div class="table-wrap">
+            <table>
+                <tr><th>Name</th><th class="amount">Amount</th><th>Usually for</th></tr>
+                <?php foreach ($bookmarks as $bookmark): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($bookmark['name']) ?></td>
+                        <td class="amount">R<?= number_format($bookmark['amount'], 2) ?></td>
+                        <td><?= htmlspecialchars($bookmark['default_client'] ?? 'Ask each time') ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+    </section>
 
-    <h2>Add a bookmark</h2>
-    <?php if ($error !== ''): ?>
-        <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
-    <form method="post">
-        <p><label>Name: <input type="text" name="name" required maxlength="100"></label></p>
-        <p><label>Amount: R<input type="number" name="amount" required min="0.01" step="0.01"></label></p>
-        <p>
-            <label>Usually for:
+    <section class="card">
+        <h2>Add a bookmark</h2>
+        <?php if ($error !== ''): ?>
+            <p class="notice error"><?= htmlspecialchars($error) ?></p>
+        <?php endif; ?>
+        <form method="post" class="stack">
+            <label>Name
+                <input type="text" name="name" required maxlength="100">
+            </label>
+            <label>Amount
+                <span class="money"><span>R</span><input type="number" name="amount" required min="0.01" step="0.01"></span>
+            </label>
+            <label>Usually for
                 <select name="default_client_id">
                     <option value="0">Ask each time</option>
                     <?php foreach ($clients as $client): ?>
@@ -67,8 +79,9 @@ $bookmarks = $pdo->query("
                     <?php endforeach; ?>
                 </select>
             </label>
-        </p>
-        <button type="submit">Save bookmark</button>
-    </form>
+            <div><button type="submit">Save bookmark</button></div>
+        </form>
+    </section>
+</main>
 </body>
 </html>

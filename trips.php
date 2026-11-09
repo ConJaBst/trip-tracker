@@ -21,30 +21,37 @@ $stmt = $pdo->prepare("
 $stmt->execute([$client_id]);
 $trips = $stmt->fetchAll();
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Trips for <?= htmlspecialchars($client['name']) ?></title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <p><a href="index.php">&larr; Back</a></p>
+<main class="page">
+    <a class="back-link" href="index.php">&larr; Back</a>
     <h1>Unpaid trips for <?= htmlspecialchars($client['name']) ?></h1>
 
-    <?php if (count($trips) === 0): ?>
-        <p>No unpaid trips.</p>
-    <?php else: ?>
-        <table border="1" cellpadding="6">
-            <tr><th>Date</th><th>Trip</th><th>Amount</th></tr>
-            <?php foreach ($trips as $trip): ?>
-                <tr>
-                    <td><?= $trip['trip_date'] ?></td>
-                    <td><?= htmlspecialchars($trip['description']) ?></td>
-                    <td>R<?= number_format($trip['amount'], 2) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
-    <?php endif; ?>
+    <section class="card">
+        <?php if (count($trips) === 0): ?>
+            <p class="muted">No unpaid trips.</p>
+        <?php else: ?>
+            <div class="table-wrap">
+                <table>
+                    <tr><th>Date</th><th>Trip</th><th class="amount">Amount</th></tr>
+                    <?php foreach ($trips as $trip): ?>
+                        <tr>
+                            <td><?= $trip['trip_date'] ?></td>
+                            <td><?= htmlspecialchars($trip['description']) ?></td>
+                            <td class="amount">R<?= number_format($trip['amount'], 2) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </div>
+        <?php endif; ?>
+    </section>
+</main>
 </body>
 </html>

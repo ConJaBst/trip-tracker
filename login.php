@@ -24,17 +24,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Log in · Trip tracker</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Trip tracker</h1>
+<main class="login-page">
+    <div class="card">
+        <h1>Trip tracker</h1>
+        <p class="muted">Log in to continue</p>
 
-    <?php if ($error): ?>
-        <p style="color: crimson"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
+        <?php if ($error): ?>
+            <p class="notice error"><?= htmlspecialchars($error) ?></p>
+        <?php endif; ?>
 
-    <form method="post">
-        <label>Password: <input type="password" name="password" required autofocus></label>
-        <button>Log in</button>
-    </form>
+        <form method="post" class="stack">
+            <label>Password
+                <input type="password" name="password" required autofocus>
+            </label>
+            <button>Log in</button>
+        </form>
+    </div>
+</main>
 </body>
 </html>

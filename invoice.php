@@ -37,79 +37,67 @@ function niceDate(string $date): string {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $number ?> for <?= htmlspecialchars($invoice['client_name']) ?></title>
-    <style>
-        body    { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; padding: 0 16px; color: #222; }
-        .top    { display: flex; justify-content: space-between; align-items: flex-start; }
-        h1      { margin: 0; font-size: 32px; letter-spacing: 2px; }
-        .muted  { color: #666; }
-        table   { width: 100%; border-collapse: collapse; margin-top: 24px; }
-        th, td  { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; }
-        .amount { text-align: right; }
-        .total td { font-weight: bold; font-size: 18px; border-top: 2px solid #222; border-bottom: none; }
-        .status { display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: bold; }
-        .paid   { background: #e6ffe6; color: #1a6b1a; }
-        .unpaid { background: #ffe6e6; color: #a11; }
-
-        /* When printing (or saving as PDF), hide the buttons and links */
-        @media print {
-            .no-print { display: none; }
-            body { margin: 0; }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="no-print" style="margin-bottom:24px;">
-        <a href="index.php">&larr; Dashboard</a>
-        <button onclick="window.print()">Print or save as PDF</button>
-        <form method="post" action="mark_paid.php" style="display:inline;">
+<main class="page">
+    <!-- Everything with class "no-print" is hidden when you print or save as PDF -->
+    <div class="toolbar no-print">
+        <a class="back-link" href="index.php">&larr; Dashboard</a>
+        <button class="secondary" onclick="window.print()">Print or save as PDF</button>
+        <form method="post" action="mark_paid.php">
             <input type="hidden" name="id" value="<?= $invoice['id'] ?>">
             <?php if ($invoice['paid_at'] === null): ?>
                 <input type="hidden" name="paid" value="1">
                 <button type="submit">Mark as paid</button>
             <?php else: ?>
                 <input type="hidden" name="paid" value="0">
-                <button type="submit">Mark as unpaid</button>
+                <button type="submit" class="secondary">Mark as unpaid</button>
             <?php endif; ?>
         </form>
     </div>
 
-    <div class="top">
-        <div>
-            <h1>INVOICE</h1>
-            <p class="muted"><?= $number ?></p>
-            <?php if ($invoice['paid_at'] === null): ?>
-                <span class="status unpaid">UNPAID</span>
-            <?php else: ?>
-                <span class="status paid">PAID <?= niceDate($invoice['paid_at']) ?></span>
-            <?php endif; ?>
+    <article class="card invoice">
+        <div class="invoice-top">
+            <div>
+                <h1>INVOICE</h1>
+                <p class="muted"><?= $number ?></p>
+                <?php if ($invoice['paid_at'] === null): ?>
+                    <span class="status unpaid">UNPAID</span>
+                <?php else: ?>
+                    <span class="status paid">PAID <?= niceDate($invoice['paid_at']) ?></span>
+                <?php endif; ?>
+            </div>
+            <div class="right">
+                <p><strong>From:</strong> <?= htmlspecialchars($myName) ?><br>
+                   <strong>To:</strong> <?= htmlspecialchars($invoice['client_name']) ?></p>
+                <p class="muted">Issued <?= niceDate($invoice['created_at']) ?></p>
+            </div>
         </div>
-        <div style="text-align:right;">
-            <p><strong>From:</strong> <?= htmlspecialchars($myName) ?><br>
-               <strong>To:</strong> <?= htmlspecialchars($invoice['client_name']) ?></p>
-            <p class="muted">Issued <?= niceDate($invoice['created_at']) ?></p>
-        </div>
-    </div>
 
-    <p>Trips from <strong><?= niceDate($invoice['period_start']) ?></strong>
-       to <strong><?= niceDate($invoice['period_end']) ?></strong></p>
+        <p>Trips from <strong><?= niceDate($invoice['period_start']) ?></strong>
+           to <strong><?= niceDate($invoice['period_end']) ?></strong></p>
 
-    <table>
-        <tr><th>Date</th><th>Trip</th><th class="amount">Amount</th></tr>
-        <?php foreach ($trips as $trip): ?>
-            <tr>
-                <td><?= niceDate($trip['trip_date']) ?></td>
-                <td><?= htmlspecialchars($trip['description']) ?></td>
-                <td class="amount">R<?= number_format($trip['amount'], 2) ?></td>
+        <table>
+            <tr><th>Date</th><th>Trip</th><th class="amount">Amount</th></tr>
+            <?php foreach ($trips as $trip): ?>
+                <tr>
+                    <td><?= niceDate($trip['trip_date']) ?></td>
+                    <td><?= htmlspecialchars($trip['description']) ?></td>
+                    <td class="amount">R<?= number_format($trip['amount'], 2) ?></td>
+                </tr>
+            <?php endforeach; ?>
+            <tr class="total">
+                <td colspan="2"><?= count($trips) ?> trip<?= count($trips) === 1 ? '' : 's' ?></td>
+                <td class="amount">R<?= number_format($invoice['total'], 2) ?></td>
             </tr>
-        <?php endforeach; ?>
-        <tr class="total">
-            <td colspan="2"><?= count($trips) ?> trip<?= count($trips) === 1 ? '' : 's' ?></td>
-            <td class="amount">R<?= number_format($invoice['total'], 2) ?></td>
-        </tr>
-    </table>
+        </table>
+    </article>
+</main>
 </body>
 </html>

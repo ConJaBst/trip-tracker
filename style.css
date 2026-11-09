@@ -1,0 +1,259 @@
+/* style.css: one stylesheet for every page of the trip tracker.
+   Light, bright and simple. Change a colour here and it changes everywhere. */
+
+/* ---------- 1. Colours and sizes (CSS "variables") ---------- */
+:root {
+    --bg:        #f4f7fb;   /* page background: very light blue-grey */
+    --card:      #ffffff;   /* white boxes the content sits in */
+    --text:      #1f2937;   /* main text: dark grey, softer than black */
+    --muted:     #6b7280;   /* quieter text */
+    --line:      #e5e9f0;   /* borders and table lines */
+    --accent:    #2f80ed;   /* bright blue for buttons and links */
+    --accent-dk: #1c64c8;   /* darker blue for hover */
+    --accent-lt: #eaf2fe;   /* pale blue for highlights */
+
+    --good-bg: #e8f8ee;  --good: #18794e;   /* green: success, paid */
+    --bad-bg:  #fdecec;  --bad:  #c62828;   /* red: errors, unpaid */
+    --warn-bg: #fff6db;  --warn: #8a6100;   /* yellow: warnings */
+
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(16, 24, 40, .06), 0 1px 2px rgba(16, 24, 40, .04);
+}
+
+/* ---------- 2. The page ---------- */
+* { box-sizing: border-box; }   /* padding no longer makes boxes wider */
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* .page keeps everything in a centred column */
+.page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 16px 64px;
+}
+
+h1 { font-size: 28px; margin: 0 0 8px; }
+h2 { font-size: 19px; margin: 0 0 14px; }
+
+a       { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.muted { color: var(--muted); }
+
+/* ---------- 3. Header and navigation ---------- */
+.site-header { text-align: center; margin-bottom: 24px; }
+
+.nav {
+    display: flex;
+    flex-wrap: wrap;            /* wraps onto two lines on a phone */
+    justify-content: center;
+    gap: 8px;
+    margin: 12px 0 0;
+}
+.nav a {
+    padding: 6px 14px;
+    border-radius: 999px;       /* pill shape */
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-size: 14px;
+}
+.nav a:hover { background: var(--accent-lt); border-color: var(--accent); text-decoration: none; }
+
+.back-link { display: inline-block; margin-bottom: 16px; font-size: 14px; }
+
+/* ---------- 4. Cards (the white boxes) ---------- */
+.card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* ---------- 5. Tables ---------- */
+.table-wrap { overflow-x: auto; }   /* wide tables scroll sideways on phones */
+
+table { width: 100%; border-collapse: collapse; }
+th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+}
+th {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    font-weight: 600;
+}
+tbody tr:hover, tr:hover td { background: #f9fbfe; }
+.amount { text-align: right; white-space: nowrap; }
+tr.total td, tr.total th {
+    font-weight: 700;
+    border-top: 2px solid var(--text);
+    border-bottom: none;
+    color: var(--text);
+}
+
+/* ---------- 6. Forms ---------- */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="password"],
+select {
+    font: inherit;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid #cfd6e0;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+}
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-lt);
+}
+
+/* .stack: one field per line, label above the box */
+.stack { display: grid; gap: 14px; }
+.stack label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
+.stack input, .stack select { width: 100%; font-weight: 400; }
+
+/* .inline: fields side by side, wrapping when there's no room */
+.inline { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.inline label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
+
+/* An amount box with a little "R" in front of it */
+.money { display: flex; align-items: center; }
+.money span {
+    padding: 8px 10px;
+    background: var(--accent-lt);
+    border: 1px solid #cfd6e0;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    font-weight: 600;
+}
+.money input { border-radius: 0 8px 8px 0; }
+
+/* ---------- 7. Buttons ---------- */
+button {
+    font: inherit;
+    font-weight: 600;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+}
+button:hover    { background: var(--accent-dk); }
+button:disabled { opacity: .6; cursor: default; }
+
+/* A quieter white button */
+button.secondary {
+    background: #fff;
+    color: var(--text);
+    border: 1px solid #cfd6e0;
+}
+button.secondary:hover { background: var(--accent-lt); }
+
+/* ---------- 8. Quick log rows ---------- */
+.quick-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+}
+.quick-row:last-child { border-bottom: none; padding-bottom: 0; }
+.quick-row:first-of-type { padding-top: 0; }
+.quick-row .name { flex: 1 1 180px; }
+.quick-row .price { color: var(--muted); font-weight: 400; }
+
+/* On a phone, put the trip name on its own line above the dropdown + button */
+@media (max-width: 520px) {
+    .quick-row .name { flex-basis: 100%; }
+    .quick-row select { flex: 1; }
+}
+
+/* ---------- 9. Messages ---------- */
+.notice {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin: 0 0 20px;
+    background: var(--good-bg);
+    color: var(--good);
+}
+.notice.error   { background: var(--bad-bg);  color: var(--bad); }
+.notice.warning { background: var(--warn-bg); color: var(--warn); }
+.notice button  { margin-left: 8px; padding: 4px 12px; }
+.notice[hidden] { display: none; }
+
+/* Small coloured labels like PAID / UNPAID */
+.status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+}
+.status.paid   { background: var(--good-bg); color: var(--good); }
+.status.unpaid { background: var(--bad-bg);  color: var(--bad); }
+
+/* ---------- 10. Login page ---------- */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;        /* centred up and down */
+    justify-content: center;    /* centred left and right */
+    padding: 16px;
+}
+.login-page .card { width: 100%; max-width: 360px; text-align: center; }
+.login-page .stack { text-align: left; margin-top: 16px; }
+.login-page button { width: 100%; }
+
+/* ---------- 11. Invoice page ---------- */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.toolbar .back-link { margin: 0 auto 0 0; }   /* pushes the buttons to the right */
+.toolbar form { margin: 0; }
+
+.invoice { padding: 32px; }
+.invoice-top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.invoice-top h1 { font-size: 30px; letter-spacing: 3px; color: var(--accent); margin: 0; }
+.invoice-top .right { text-align: right; }
+.invoice table { margin-top: 16px; }
+
+/* ---------- 12. Printing (or Save as PDF) ---------- */
+@media print {
+    .no-print { display: none !important; }
+    body  { background: #fff; }
+    .page { max-width: none; padding: 0; }
+    .card { border: none; box-shadow: none; padding: 0; }
+    tr:hover td { background: none; }
+    a { color: inherit; }
+    /* make browsers print the coloured PAID/UNPAID label */
+    .status { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

@@ -1,7 +1,7 @@
 <?php
 require 'auth.php';  // make sure the user is logged in
 require 'db.php';
-require 'invoic_functions.php';  
+require 'invoice_functions.php';  
 
 // Checks text is a real date in the form 2026-11-09
 function isValidDate(string $text): bool {
@@ -83,72 +83,82 @@ if ($client && $error === '') {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>New invoice</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <p><a href="index.php">&larr; Back</a></p>
+<main class="page">
+    <a class="back-link" href="index.php">&larr; Back</a>
     <h1>New invoice</h1>
 
     <?php if ($error !== ''): ?>
-        <p style="color:red;"><?= htmlspecialchars($error) ?></p>
+        <p class="notice error"><?= htmlspecialchars($error) ?></p>
     <?php endif; ?>
 
-    <form method="get">
-        <label>For:
-            <select name="client">
-                <?php foreach ($clients as $c): ?>
-                    <option value="<?= $c['id'] ?>" <?= $c['id'] == $clientId ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($c['name']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-        <label>From: <input type="date" name="from" value="<?= htmlspecialchars($from) ?>" required></label>
-        <label>To: <input type="date" name="to" value="<?= htmlspecialchars($to) ?>" required></label>
-        <button type="submit">Show trips</button>
-    </form>
+    <section class="card">
+        <form method="get" class="inline">
+            <label>For
+                <select name="client">
+                    <?php foreach ($clients as $c): ?>
+                        <option value="<?= $c['id'] ?>" <?= $c['id'] == $clientId ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($c['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+            <label>From <input type="date" name="from" value="<?= htmlspecialchars($from) ?>" required></label>
+            <label>To <input type="date" name="to" value="<?= htmlspecialchars($to) ?>" required></label>
+            <button type="submit" class="secondary">Show trips</button>
+        </form>
+    </section>
 
     <?php if ($client && $error === ''): ?>
-        <h2>Trips to bill <?= htmlspecialchars($client['name']) ?></h2>
+        <section class="card">
+            <h2>Trips to bill <?= htmlspecialchars($client['name']) ?></h2>
 
-        <?php if ($olderCount > 0): ?>
-            <p style="background:#fff3cd; padding:8px;">
-                <?= htmlspecialchars($client['name']) ?> also has <?= $olderCount ?> unbilled
-                trip<?= $olderCount === 1 ? '' : 's' ?> from before <?= htmlspecialchars($from) ?>.
-                Move the "from" date back if they belong on this invoice.
-            </p>
-        <?php endif; ?>
+            <?php if ($olderCount > 0): ?>
+                <p class="notice warning">
+                    <?= htmlspecialchars($client['name']) ?> also has <?= $olderCount ?> unbilled
+                    trip<?= $olderCount === 1 ? '' : 's' ?> from before <?= htmlspecialchars($from) ?>.
+                    Move the "from" date back if they belong on this invoice.
+                </p>
+            <?php endif; ?>
 
-        <?php if (count($trips) === 0): ?>
-            <p>No trips to bill in these dates.</p>
-        <?php else: ?>
-            <table border="1" cellpadding="6">
-                <tr><th>Date</th><th>Trip</th><th>Amount</th><th></th></tr>
-                <?php foreach ($trips as $trip): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($trip['trip_date']) ?></td>
-                        <td><?= htmlspecialchars($trip['description']) ?></td>
-                        <td>R<?= number_format($trip['amount'], 2) ?></td>
-                        <td>
-                            <?php if ($trip['invoice_id'] !== null): ?>
-                                Carried over from unpaid <?= sprintf('INV-%04d', $trip['invoice_id']) ?>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                <tr><th colspan="2">Total</th><th>R<?= number_format($total, 2) ?></th><th></th></tr>
-            </table>
+            <?php if (count($trips) === 0): ?>
+                <p class="muted">No trips to bill in these dates.</p>
+            <?php else: ?>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>Date</th><th>Trip</th><th class="amount">Amount</th><th></th></tr>
+                        <?php foreach ($trips as $trip): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($trip['trip_date']) ?></td>
+                                <td><?= htmlspecialchars($trip['description']) ?></td>
+                                <td class="amount">R<?= number_format($trip['amount'], 2) ?></td>
+                                <td class="muted">
+                                    <?php if ($trip['invoice_id'] !== null): ?>
+                                        Carried over from unpaid <?= sprintf('INV-%04d', $trip['invoice_id']) ?>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <tr class="total"><td colspan="2">Total</td><td class="amount">R<?= number_format($total, 2) ?></td><td></td></tr>
+                    </table>
+                </div>
 
-            <form method="post">
-                <input type="hidden" name="client" value="<?= $clientId ?>">
-                <input type="hidden" name="from" value="<?= htmlspecialchars($from) ?>">
-                <input type="hidden" name="to" value="<?= htmlspecialchars($to) ?>">
-                <p><button type="submit">Create invoice for R<?= number_format($total, 2) ?></button></p>
-            </form>
-        <?php endif; ?>
+                <form method="post">
+                    <input type="hidden" name="client" value="<?= $clientId ?>">
+                    <input type="hidden" name="from" value="<?= htmlspecialchars($from) ?>">
+                    <input type="hidden" name="to" value="<?= htmlspecialchars($to) ?>">
+                    <p><button type="submit">Create invoice for R<?= number_format($total, 2) ?></button></p>
+                </form>
+            <?php endif; ?>
+        </section>
     <?php endif; ?>
+</main>
 </body>
 </html>
