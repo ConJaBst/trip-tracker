@@ -4,7 +4,7 @@ require 'db.php';   // runs db.php, so $pdo now exists here
 
 $client_id = $_GET['client'] ?? 0;
 
-$stmt = $pdo->prepare("SELECT name FROM clients WHERE client_id = ? AND (invoice_id IS NULL OR invoice_id IN (SELECT id FROM invoices WHERE paid_at IS NULL))");
+$stmt = $pdo->prepare("SELECT name FROM clients WHERE client_id = ?");
 $stmt->execute([$client_id]);
 $client = $stmt->fetch();
 
@@ -15,7 +15,7 @@ if(!$client) {
 $stmt = $pdo->prepare("
     SELECT trip_date, amount, description
     FROM trips
-    WHERE client_id = ? AND invoice_id IS NULL
+    WHERE client_id = ? AND (invoice_id IS NULL OR invoice_id IN (SELECT id FROM invoices WHERE paid_at IS NULL))
     ORDER BY trip_date DESC, id DESC
 ");
 $stmt->execute([$client_id]);
