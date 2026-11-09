@@ -257,3 +257,24 @@ button.secondary:hover { background: var(--accent-lt); }
     /* make browsers print the coloured PAID/UNPAID label */
     .status { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* ---------- 12. Edit / Delete links in a table row ---------- */
+.row-actions {
+    white-space: nowrap;
+    text-align: right;
+}
+.row-actions form { display: inline; margin: 0 0 0 12px; }
+
+/* A button that looks like a link (for Delete) */
+button.link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--accent);
+    font-weight: 400;
+}
+button.link-button:hover  { background: none; text-decoration: underline; }
+button.link-button.danger { color: var(--bad); }
+
+/* Save + Cancel side by side */
+.form-buttons { display: flex; align-items: center; gap: 16px; }
