@@ -10,6 +10,7 @@ $config = [
     'db_pass'       => getenv('DB_PASS') ?: '',
     'db_ssl_ca'     => getenv('DB_SSL_CA') ?: '',          // only needed on Azure
     'password_hash' => getenv('APP_PASSWORD_HASH') ?: '',  // the login password, scrambled
+    'cron_key'      => getenv('CRON_KEY') ?: '',           // the weekly job's secret key
 ];
 
 // If config.local.php exists, its values replace the ones above.
