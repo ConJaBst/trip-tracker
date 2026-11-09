@@ -13,7 +13,7 @@ $message = $_GET['message'] ?? '';
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Trip tracker</title>
+    <title>Connor's Trip tracker</title>
     <script src="app.js" defer></script>
 </head>
 <body>
