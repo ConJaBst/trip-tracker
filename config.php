@@ -16,3 +16,6 @@ $config = [
 if (file_exists(__DIR__ . '/config.local.php')) {
     $config = array_merge($config, require __DIR__ . '/config.local.php');
 }
+
+// Use South African time for every date() call, on any computer.
+date_default_timezone_set('Africa/Johannesburg');
